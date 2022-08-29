@@ -1,18 +1,23 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'react-native-esp32-provisioning';
+import { initESPModule, scanWifiList } from 'react-native-esp32-provisioning';
 
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
+  const [result, setResult] = React.useState<any>();
 
   React.useEffect(() => {
-    multiply(3, 7).then(setResult);
+
+
+    initESPModule("3, 7").then((res) => {
+      setResult(res)
+      scanWifiList().then(res => console.log(res)).catch(err => console.log(err))
+    });
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Text>Result: {result?.toString()}</Text>
     </View>
   );
 }
