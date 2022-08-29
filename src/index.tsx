@@ -22,14 +22,29 @@ interface WiFiAccessPoint {
     password: string
 }
 
-export function multiply(a: number, b: number): Promise<number> {
-    return Esp32Provisioning.multiply(a, b);
+class Esp32{
+    private static inited: boolean = false
+
+    static init(pop: string): void {
+        if (!pop) {
+            throw new Error("Pop cannot be empty");
+        }
+        this.inited = Esp32Provisioning.initESPModule(pop);
+    }
+
+    static scanWifi(): Promise<WiFiAccessPoint[]>  {
+        if (!this.inited) {
+            throw new Error("You should call init first");
+        }
+        return Esp32Provisioning.scanWifiList();
+    }
+
+    static provise(ssid: string, password: string): Promise<boolean> {
+        return Esp32Provisioning.provision(ssid, password)
+    }
 }
 
-export function initESPModule(pop: string): Promise<boolean> {
-    return Esp32Provisioning.initESPModule(pop);
-}
-
-export function scanWifiList(): Promise<WiFiAccessPoint> {
-    return Esp32Provisioning.scanWifiList();
+export default Esp32
+export {
+    WiFiAccessPoint
 }

@@ -13,6 +13,7 @@ import com.espressif.provisioning.ESPDevice;
 import com.espressif.provisioning.ESPProvisionManager;
 import com.espressif.provisioning.WiFiAccessPoint;
 import com.espressif.provisioning.listeners.WiFiScanListener;
+import com.espressif.provisioning.listeners.ProvisionListener;
 
 import java.util.ArrayList;
 
@@ -65,6 +66,51 @@ public class Esp32ProvisioningModule extends ReactContextBaseJavaModule {
             @Override
             public void onWiFiScanFailed(Exception e) {
                 promise.reject(e);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void provision(String ssid, String password, Promise promise) {
+        espDevice.provision(ssid, password, new ProvisionListener() {
+            @Override
+            public void onProvisioningFailed(Exception e) {
+                promise.reject(e);
+            }
+
+            @Override
+            public void createSessionFailed(Exception e) {
+                promise.reject(e);
+            }
+
+            @Override
+            public void wifiConfigSent() {
+                promise.resolve(true);
+            }
+
+            @Override
+            public void wifiConfigFailed(Exception e) {
+                promise.reject(e);
+            }
+
+            @Override
+            public void wifiConfigApplied() {
+                promise.resolve(true);
+            }
+
+            @Override
+            public void wifiConfigApplyFailed(Exception e) {
+                promise.reject(e);
+            }
+
+            @Override
+            public void provisioningFailedFromDevice(ESPConstants.ProvisionFailureReason failureReason) {
+                promise.reject(String.valueOf(failureReason), "something wrong");
+            }
+
+            @Override
+            public void deviceProvisioningSuccess() {
+                promise.resolve(true);
             }
         });
     }
