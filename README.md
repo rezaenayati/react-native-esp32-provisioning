@@ -1,19 +1,30 @@
 # react-native-esp32-provisioning
-Package for Wifi provsioning ESP32 devices
+This Package is for wifi provisioning esp32 device based on official native android package (https://github.com/espressif/esp-idf-provisioning-android)
+
+You can find a document in esp32 website https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/provisioning/wifi_provisioning.html#provisioning-tools
+
 ## Installation
 
 ```sh
 npm install react-native-esp32-provisioning
 ```
 
+or
+
+```sh
+yarn add react-native-esp32-provisioning
+```
+
 ## Usage
 
 ```js
-import { multiply } from "react-native-esp32-provisioning";
+import ESP32 from 'react-native-esp32-provisioning';
 
 // ...
 
-const result = await multiply(3, 7);
+await ESP32.init(pop)
+
+await ESP32.provise(SSID, Password)
 ```
 
 ## Contributing
