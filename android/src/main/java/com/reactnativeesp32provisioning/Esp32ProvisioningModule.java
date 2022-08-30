@@ -11,8 +11,6 @@ import com.facebook.react.module.annotations.ReactModule;
 import com.espressif.provisioning.ESPConstants;
 import com.espressif.provisioning.ESPDevice;
 import com.espressif.provisioning.ESPProvisionManager;
-import com.espressif.provisioning.WiFiAccessPoint;
-import com.espressif.provisioning.listeners.WiFiScanListener;
 import com.espressif.provisioning.listeners.ProvisionListener;
 
 import java.util.ArrayList;
@@ -35,19 +33,11 @@ public class Esp32ProvisioningModule extends ReactContextBaseJavaModule {
         return NAME;
     }
 
-
-    // Example method
-    // See https://reactnative.dev/docs/native-modules-android
     @ReactMethod
-    public void multiply(double a, double b, Promise promise) {
-        promise.resolve(a * b);
-    }
-
-    @ReactMethod
-    public void initESPModule(String pop, Promise promise) {
+    public void init(String pop, Promise promise) {
         try {
             provisionManager = ESPProvisionManager.getInstance(this.context);
-            espDevice = provisionManager.createESPDevice(ESPConstants.TransportType.TRANSPORT_SOFTAP, ESPConstants.SecurityType.SECURITY_1);
+            provisionManager.createESPDevice(ESPConstants.TransportType.TRANSPORT_SOFTAP, ESPConstants.SecurityType.SECURITY_1);
             provisionManager.getEspDevice().setProofOfPossession(pop);
             promise.resolve(true);
         } catch (Exception e) {
@@ -56,28 +46,13 @@ public class Esp32ProvisioningModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void scanWifiList(Promise promise) {
-        espDevice.scanNetworks(new WiFiScanListener() {
-            @Override
-            public void onWifiListReceived(ArrayList<WiFiAccessPoint> wifiList) {
-                promise.resolve(wifiList);
-            }
-
-            @Override
-            public void onWiFiScanFailed(Exception e) {
-                promise.reject(e);
-            }
-        });
-    }
-
-    @ReactMethod
     public void provision(String ssid, String password, Promise promise) {
-        espDevice.provision(ssid, password, new ProvisionListener() {
+        provisionManager.getEspDevice().provision(ssid, password, new ProvisionListener() {
             @Override
             public void onProvisioningFailed(Exception e) {
                 promise.reject(e);
             }
-
+            
             @Override
             public void createSessionFailed(Exception e) {
                 promise.reject(e);
@@ -85,7 +60,6 @@ public class Esp32ProvisioningModule extends ReactContextBaseJavaModule {
 
             @Override
             public void wifiConfigSent() {
-                promise.resolve(true);
             }
 
             @Override
@@ -95,7 +69,6 @@ public class Esp32ProvisioningModule extends ReactContextBaseJavaModule {
 
             @Override
             public void wifiConfigApplied() {
-                promise.resolve(true);
             }
 
             @Override
@@ -105,7 +78,7 @@ public class Esp32ProvisioningModule extends ReactContextBaseJavaModule {
 
             @Override
             public void provisioningFailedFromDevice(ESPConstants.ProvisionFailureReason failureReason) {
-                promise.reject(String.valueOf(failureReason), "something wrong");
+                promise.reject(String.valueOf(failureReason));
             }
 
             @Override
